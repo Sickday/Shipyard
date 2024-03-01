@@ -13,30 +13,17 @@ on:
       - 'sdl2/**'
 
 jobs:
-  DebianSDL2:
+  SDL2:
+    strategy:
+      matrix: 
+        subtype: ["Debian", "Python", "Ruby"]
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
       path: sdl2/
-      file: Debian.Dockerfile
+      file: "${{ matrix.subtype }}.Dockerfile"
       image: sdl2
-      tag: latest
+      tag: ${{ matrix.subtype }}
     secrets:
       DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
-  RubySDL2:
-    uses: ./.github/workflows/build_push.yml
-    with:
-      ref: ${{ github.ref }}
-      path: sdl2/
-      file: Ruby.Dockerfile
-      image: sdl2
-      tag: ruby
-  PythonSDL2:
-    uses: ./.github/workflows/build_push.yml
-    with:
-      ref: ${{ github.ref }}
-      path: sdl2/
-      file: Python.Dockerfile
-      image: sdl2
-      tag: python
