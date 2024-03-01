@@ -41,5 +41,5 @@ jobs:
         with:
           push: true
           context: "{{defaultContext}}:sdl2"
-          file: sdl2/Dockerfile
+          file: "{context}/sdl2/Dockerfile"
           tags: sickday/${{ inputs.image }}:${{ inputs.tag }}
