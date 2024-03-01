@@ -18,7 +18,7 @@ on:
       DH_USER:
         required: true
       DH_PASS:
-        required: truse
+        required: true
 
 jobs:
   BuildAndPush:
