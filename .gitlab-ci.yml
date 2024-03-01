@@ -1,6 +1,10 @@
 stages:
   - sdl2
 
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay
+
 sdl2.build:
   stage: sdl2
   image: docker:latest
