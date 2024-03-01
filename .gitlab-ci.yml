@@ -1,0 +1,13 @@
+stages:
+  - sdl2
+
+sdl2.build:
+  stage: sdl2
+  tags:
+    - shared
+  services:
+    - docker:dind
+  script:
+    - docker login -u sickday -p ${DOCKER}
+    - docker build --file sdl2/Dockerfile -t sdl2:latest sdl2/
+    - docker push sdl2:latest
