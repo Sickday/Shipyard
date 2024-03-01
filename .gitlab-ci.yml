@@ -6,6 +6,7 @@ sdl2.build:
   image: docker:dind
   tags:
     - shared
+    - dind
   script:
     - docker login -u sickday -p ${DOCKER}
     - docker build --file sdl2/Dockerfile -t sdl2:latest sdl2/
