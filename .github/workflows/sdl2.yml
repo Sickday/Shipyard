@@ -17,6 +17,7 @@ jobs:
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
+      path: sdl2
       image: sdl2
       tag: latest
     secrets:
