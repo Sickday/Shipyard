@@ -53,5 +53,5 @@ jobs:
         with:
           push: true
           context: "./${{ inputs.path }}/"
-          file: "./${{ inputs.file }}"
+          file: "./${{ inputs.path }}/${{ inputs.file }}"
           tags: sickday/${{ inputs.image }}:${{ inputs.tag }}
