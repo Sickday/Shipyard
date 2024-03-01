@@ -27,6 +27,11 @@ jobs:
   BuildAndPush:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
