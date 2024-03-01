@@ -40,6 +40,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          context: "{{defaultContext}}:sdl2"
+          context: ./sdl2
           file: ./sdl2/Dockerfile
           tags: sickday/${{ inputs.image }}:${{ inputs.tag }}
