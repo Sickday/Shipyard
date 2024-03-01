@@ -14,6 +14,10 @@ on:
         required: false
         type: string
         default: "latest"
+      file:
+        required: true
+        type: string
+        default: "Dockerfile"
       path:
         required: true
         type: string
@@ -49,5 +53,5 @@ jobs:
         with:
           push: true
           context: "./${{ inputs.path }}/"
-          file: "./${{ inputs.path }}/Dockerfile"
+          file: "./${{ inputs.file }}"
           tags: sickday/${{ inputs.image }}:${{ inputs.tag }}
