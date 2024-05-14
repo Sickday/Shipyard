@@ -15,7 +15,7 @@ on:
       - 'elixir/node/**'
 
 jobs:
-  SDL2:
+  NodeJs:
     strategy:
       matrix: 
         subtype: 
