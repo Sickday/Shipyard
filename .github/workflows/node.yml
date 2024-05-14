@@ -1,5 +1,5 @@
 ---
-name: Ruby with Nodejs
+name: Build all Nodejs images
 
 on:
   schedule:
@@ -10,16 +10,24 @@ on:
     branches:
       - main
     paths:
-      - 'ruby-node/**'
+      - 'ruby/node/**'
+      - 'python/node/**'
+      - 'elixir/node/**'
 
 jobs:
-  RubyNodeJS:
+  SDL2:
+    strategy:
+      matrix: 
+        subtype: 
+          - "python"
+          - "ruby"
+          - "elixir"
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
-      path: ruby-node/
-      file: "Dockerfile"
-      image: ruby
+      path: "${{ matrix.subtype }}/node/"
+      file: Dockerfile
+      image: ${{ matrix.subtype }}
       tag: node
     secrets:
       DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
