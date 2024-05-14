@@ -1,5 +1,5 @@
 ---
-name: SDL2
+name: Build all SDL2 images
 
 on:
   schedule:
@@ -10,20 +10,21 @@ on:
     branches:
       - main
     paths:
-      - 'sdl2/**'
+      - 'ruby/sdl2/**'
+      - 'python/sdl2/**'
 
 jobs:
   SDL2:
     strategy:
       matrix: 
-        subtype: ["Debian", "Python", "Ruby"]
+        subtype: ["python", "ruby"]
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
-      path: sdl2/
-      file: "${{ matrix.subtype }}.Dockerfile"
-      image: sdl2
-      tag: ${{ matrix.subtype }}
+      path: "${{ matrix.subtype }}/sdl2/"
+      file: Dockerfile
+      image: ${{ matrix.subtype }}
+      tag: sdl2
     secrets:
       DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
