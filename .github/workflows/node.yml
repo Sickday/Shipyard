@@ -13,6 +13,8 @@ on:
       - 'ruby/node/**'
       - 'python/node/**'
       - 'elixir/node/**'
+      - 'crystal/node/**'
+      - 'rust/node/**'
 
 jobs:
   NodeJs:
@@ -22,6 +24,8 @@ jobs:
           - "python"
           - "ruby"
           - "elixir"
+          - "crystal"
+          - "rust"
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
