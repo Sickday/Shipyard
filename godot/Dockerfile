@@ -13,7 +13,16 @@ FROM barichello/godot-ci:mono-4.6.3
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        nodejs npm awscli unzip zip git ca-certificates \
+        nodejs npm unzip zip git ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
+
+# AWS CLI v2 from AWS's official bundle. Ubuntu noble (24.04) dropped the
+# `awscli` apt package, so the repo install ("no installation candidate") is
+# dead — fetch the bundle and run its installer instead. (amd64 only, matching
+# this image's single-arch build.)
+RUN curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip \
+    && unzip -q /tmp/awscliv2.zip -d /tmp \
+    && /tmp/aws/install \
+    && rm -rf /tmp/awscliv2.zip /tmp/aws
 
 RUN node --version && aws --version
