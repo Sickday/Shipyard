@@ -11,7 +11,7 @@ FROM eclipse-temurin:21-jdk
 # BlackLobster's `kotlinc -jvm-target 21`. Bump as needed.
 ARG KOTLIN_VERSION=2.1.20
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl unzip zip git ca-certificates \
+    && apt-get install -y --no-install-recommends curl unzip zip git ca-certificates nodejs npm \
     && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL -o /tmp/kotlin.zip \
         "https://github.com/JetBrains/kotlin/releases/download/v${KOTLIN_VERSION}/kotlin-compiler-${KOTLIN_VERSION}.zip" \
@@ -19,4 +19,7 @@ RUN apt-get update \
     && rm /tmp/kotlin.zip
 ENV PATH="/opt/kotlinc/bin:${PATH}"
 
-RUN java -version && kotlinc -version
+# node is required because Forgejo runs JS actions (actions/checkout, etc.)
+# with `node` INSIDE this job container — same reason the other Shipyard
+# images are "<lang>/node" variants.
+RUN java -version && kotlinc -version && node --version
