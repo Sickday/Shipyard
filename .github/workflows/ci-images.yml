@@ -1,0 +1,37 @@
+---
+name: Build the game-CI images (elixir:ci, kotlin)
+
+# Images consumed by the Forgejo Actions runner at runner.dunk.works:
+#   sickday/elixir:ci     -> Elixir + node + C toolchain + rust (all 3 servers)
+#   sickday/kotlin:latest -> JDK 21 + standalone kotlinc (both Kotlin clients)
+# (Godot CI uses upstream barichello/godot-ci, not built here.)
+
+on:
+  schedule:
+    - cron: "0 12 * * 0"        # weekly, matching node.yml / sdl2.yml
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - 'elixir/ci/**'
+      - 'kotlin/**'
+
+jobs:
+  CIImages:
+    strategy:
+      matrix:
+        include:
+          - { path: "elixir/ci/", image: "elixir", tag: "ci" }
+          - { path: "kotlin/", image: "kotlin", tag: "latest" }
+    uses: ./.github/workflows/build_push.yml
+    with:
+      ref: ${{ github.ref }}
+      path: ${{ matrix.path }}
+      file: Dockerfile
+      image: ${{ matrix.image }}
+      tag: ${{ matrix.tag }}
+    secrets:
+      DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
