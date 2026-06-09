@@ -1,10 +1,11 @@
 ---
-name: Build the game-CI images (elixir:ci, kotlin)
+name: Build the game-CI images (elixir:ci, kotlin, godot)
 
 # Images consumed by the Forgejo Actions runner at runner.dunk.works:
-#   sickday/elixir:ci     -> Elixir + node + C toolchain + rust (all 3 servers)
-#   sickday/kotlin:latest -> JDK 21 + standalone kotlinc (both Kotlin clients)
-# (Godot CI uses upstream barichello/godot-ci, not built here.)
+#   sickday/elixir:ci         -> Elixir + node + C toolchain + rust (all 3 servers)
+#   sickday/kotlin:latest     -> JDK 21 + standalone kotlinc (both Kotlin clients)
+#   sickday/godot:mono-4.6.3  -> barichello godot-ci mono + node + awscli + zip
+#                                (AstralOdyssey client: B2 asset fetch -> export)
 
 on:
   schedule:
@@ -17,14 +18,17 @@ on:
     paths:
       - 'elixir/ci/**'
       - 'kotlin/**'
+      - 'godot/**'
 
 jobs:
   CIImages:
     strategy:
       matrix:
         include:
-          - { path: "elixir/ci/", image: "elixir", tag: "ci" }
-          - { path: "kotlin/", image: "kotlin", tag: "latest" }
+          - { path: "elixir/ci/", image: "elixir", tag: "ci", platforms: "linux/amd64,linux/arm64" }
+          - { path: "kotlin/", image: "kotlin", tag: "latest", platforms: "linux/amd64,linux/arm64" }
+          # godot derives an amd64-only upstream base, so amd64 only.
+          - { path: "godot/", image: "godot", tag: "mono-4.6.3", platforms: "linux/amd64" }
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
@@ -32,6 +36,7 @@ jobs:
       file: Dockerfile
       image: ${{ matrix.image }}
       tag: ${{ matrix.tag }}
+      platforms: ${{ matrix.platforms }}
     secrets:
       DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
