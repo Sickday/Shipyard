@@ -26,5 +26,17 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     && chmod -R a+rwX "$CARGO_HOME" "$RUSTUP_HOME" \
     && rustc --version && cargo --version
 
+# Docker CLI (+ buildx) so CI container-publish jobs can `docker build`/`push`
+# against the runner HOST's daemon (its socket is mounted into jobs). CLI only,
+# no daemon shipped here.
+RUN install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc \
+    && chmod a+r /etc/apt/keyrings/docker.asc \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+        > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends docker-ce-cli docker-buildx-plugin \
+    && rm -rf /var/lib/apt/lists/*
+
 # Pre-seed hex + rebar so jobs don't re-bootstrap them on every run.
 RUN mix local.hex --force && mix local.rebar --force
