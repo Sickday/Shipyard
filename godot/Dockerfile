@@ -14,7 +14,11 @@ FROM barichello/godot-ci:mono-4.6.3
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         nodejs npm unzip zip git ca-certificates curl \
+        libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
+# libfontconfig1: Godot dlopen's libfontconfig.so.1 for font handling during
+# import/export. The base image lacks it ("cannot open shared object file") —
+# harmless for --version, but can break exports that import fonts.
 
 # AWS CLI v2 from AWS's official bundle. Ubuntu noble (24.04) dropped the
 # `awscli` apt package, so the repo install ("no installation candidate") is

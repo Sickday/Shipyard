@@ -1,4 +1,4 @@
-FROM elixir:latest
+FROM elixir:1.20.1-otp-29
 
 RUN apt update && apt install -y nodejs npm
 

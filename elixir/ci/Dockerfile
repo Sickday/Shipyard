@@ -6,7 +6,11 @@
 #   - build-essential + libbz2-dev  -> bcrypt_elixir / bzip2 / crc NIFs
 #   - rust/cargo                    -> rustler NIFs (AstralOdyssey's isotope_118)
 # Pushed as sickday/elixir:ci (see .github/workflows/ci-images.yml).
-FROM elixir:latest
+#
+# Pinned (not `:latest`): `:latest` floats to in-dev Elixir releases whose new
+# warnings break `mix compile --warnings-as-errors`. Bump deliberately and keep
+# in sync with each app's Dockerfile + local dev toolchain.
+FROM elixir:1.20.1-otp-29
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
