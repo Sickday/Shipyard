@@ -10,7 +10,7 @@
 # Pinned (not `:latest`): `:latest` floats to in-dev Elixir releases whose new
 # warnings break `mix compile --warnings-as-errors`. Bump deliberately and keep
 # in sync with each app's Dockerfile + local dev toolchain.
-FROM elixir:1.20.1-otp-29
+FROM elixir:1.20.0-otp-29
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
