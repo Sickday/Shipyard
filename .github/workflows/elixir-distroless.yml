@@ -1,0 +1,35 @@
+---
+name: Build the Elixir distroless base image
+
+# Hardened distroless runtime base for shipping Elixir/Erlang releases:
+#   sickday/elixir:distroless -> distroless/cc:nonroot + deny-by-default busybox
+#                                (no wget/nc/tftpd/... compiled in) + libtinfo +
+#                                UTF-8 locale + writable /tmp.
+# OTP-agnostic (no ERTS): an app builds its release on a bookworm builder, then
+# `FROM sickday/elixir:distroless` and COPYs the release in. See
+# elixir/distroless/Dockerfile for the consume-side usage.
+
+on:
+  schedule:
+    - cron: "0 12 * * 0"        # weekly, matching the other image workflows
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - 'elixir/distroless/**'
+
+jobs:
+  ElixirDistroless:
+    uses: ./.github/workflows/build_push.yml
+    with:
+      ref: ${{ github.ref }}
+      path: "elixir/distroless/"
+      file: Dockerfile
+      image: "elixir"
+      tag: "distroless"
+      platforms: "linux/amd64,linux/arm64"
+    secrets:
+      DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+      DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
