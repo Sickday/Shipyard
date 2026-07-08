@@ -14,10 +14,11 @@
 #   * UTF-8 locale + sane RELEASE_TMP/PATH defaults (distroless has no locale, so
 #     the BEAM otherwise defaults to latin1).
 #
-# Usage in an app Dockerfile. Build the release on a *bookworm* builder so the
-# :crypto NIF links the same OpenSSL this image (distroless/cc-debian12) ships:
+# Usage in an app Dockerfile. Build the release on a *trixie* builder so the
+# :crypto NIF and the ERTS link the same glibc/OpenSSL this image
+# (distroless/cc-debian13) ships (the sickday/elixir:ci builder is trixie):
 #
-#   FROM hexpm/elixir:<ver>-erlang-<ver>-debian-bookworm-<date> AS builder
+#   FROM hexpm/elixir:<ver>-erlang-<ver>-debian-trixie-<date> AS builder
 #   # ... mix release, assemble at /rel ...
 #   FROM sickday/elixir:distroless
 #   COPY --from=builder /rel /app
@@ -30,12 +31,12 @@
 # regardless of Elixir/OTP version.
 
 ARG BUSYBOX_VERSION=1.36.1
-ARG RUNTIME_IMAGE=gcr.io/distroless/cc-debian12:nonroot
+ARG RUNTIME_IMAGE=gcr.io/distroless/cc-debian13:nonroot
 
 # ---------------------------------------------------------------------------
 # Stage 1: custom minimal static busybox (deny-by-default)
 # ---------------------------------------------------------------------------
-FROM debian:bookworm-slim AS busybox
+FROM debian:trixie-slim AS busybox
 
 ARG BUSYBOX_VERSION
 # libtinfo6 is pulled in here so we can carry libtinfo.so.6 into the final image.
@@ -99,8 +100,10 @@ FROM ${RUNTIME_IMAGE} AS base
 COPY --from=busybox /rootfs/bin /bin
 COPY --from=busybox /rootfs/tmp /tmp
 # beam.smp links libtinfo (ncurses); distroless/cc lacks it. /usr/lib is on
-# glibc's default search path; the glob stays arch-agnostic.
-COPY --from=busybox /lib/*-linux-gnu/libtinfo.so.6 /usr/lib/
+# glibc's default search path; the glob stays arch-agnostic. Source the
+# canonical /usr/lib path (not the /lib symlink) — Docker's COPY glob does not
+# resolve through /lib -> usr/lib on usr-merged Debian (trixie), so /lib/... matches nothing.
+COPY --from=busybox /usr/lib/*-linux-gnu/libtinfo.so.6 /usr/lib/
 
 ENV PATH="/bin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin"
 ENV LANG="C.UTF-8" LC_ALL="C.UTF-8" ELIXIR_ERL_OPTIONS="+fnu"
