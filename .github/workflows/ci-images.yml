@@ -2,7 +2,9 @@
 name: Build the game-CI images (elixir:ci, kotlin, godot)
 
 # Images consumed by the Forgejo Actions runner at runner.dunk.works:
-#   sickday/elixir:ci         -> Elixir + node + C toolchain + rust (all 3 servers)
+#   sickday/elixir:ci         -> Elixir 1.20 + node + C toolchain + rust (all 3 servers)
+#   sickday/elixir:ci-1.19    -> same, Elixir 1.19 / OTP 28  (isotope_118 matrix)
+#   sickday/elixir:ci-1.18    -> same, Elixir 1.18 / OTP 27  (isotope_118 matrix)
 #   sickday/kotlin:latest     -> JDK 21 + standalone kotlinc (both Kotlin clients)
 #   sickday/godot:mono-4.6.3  -> barichello godot-ci mono + node + awscli + zip
 #                                (AstralOdyssey client: B2 asset fetch -> export)
@@ -25,10 +27,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - { path: "elixir/ci/", image: "elixir", tag: "ci", platforms: "linux/amd64,linux/arm64" }
-          - { path: "kotlin/", image: "kotlin", tag: "latest", platforms: "linux/amd64,linux/arm64" }
+          - { path: "elixir/ci/", image: "elixir", tag: "ci", platforms: "linux/amd64,linux/arm64", build_args: "" }
+          # Per-version tags for libraries supporting an Elixir range (isotope_118
+          # is ~> 1.18). hexpm/elixir trixie variants, because the official
+          # elixir:1.18.4-otp-27 is bookworm and its node (18) is too old for
+          # actions/checkout@v4. See elixir/ci/Dockerfile.
+          - { path: "elixir/ci/", image: "elixir", tag: "ci-1.19", platforms: "linux/amd64,linux/arm64", build_args: "BASE_IMAGE=hexpm/elixir:1.19.5-erlang-28.5.0.3-debian-trixie-20260623" }
+          - { path: "elixir/ci/", image: "elixir", tag: "ci-1.18", platforms: "linux/amd64,linux/arm64", build_args: "BASE_IMAGE=hexpm/elixir:1.18.4-erlang-27.3.4.14-debian-trixie-20260623" }
+          - { path: "kotlin/", image: "kotlin", tag: "latest", platforms: "linux/amd64,linux/arm64", build_args: "" }
           # godot derives an amd64-only upstream base, so amd64 only.
-          - { path: "godot/", image: "godot", tag: "mono-4.6.3", platforms: "linux/amd64" }
+          - { path: "godot/", image: "godot", tag: "mono-4.6.3", platforms: "linux/amd64", build_args: "" }
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
@@ -37,6 +45,7 @@ jobs:
       image: ${{ matrix.image }}
       tag: ${{ matrix.tag }}
       platforms: ${{ matrix.platforms }}
+      build_args: ${{ matrix.build_args }}
     secrets:
       DH_USER: ${{ secrets.DOCKERHUB_USERNAME }}
       DH_PASS: ${{ secrets.DOCKERHUB_TOKEN }}

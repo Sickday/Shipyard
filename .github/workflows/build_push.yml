@@ -25,6 +25,11 @@ on:
         required: false
         type: string
         default: "linux/amd64,linux/arm64"
+      build_args:
+        description: "Newline-separated ARG=value pairs passed to the build."
+        required: false
+        type: string
+        default: ""
     secrets:
       DH_USER:
         required: true
@@ -59,4 +64,5 @@ jobs:
           context: "./${{ inputs.path }}/"
           platforms: "${{ inputs.platforms }}"
           file: "./${{ inputs.path }}/${{ inputs.file }}"
+          build-args: ${{ inputs.build_args }}
           tags: sickday/${{ inputs.image }}:${{ inputs.tag }}

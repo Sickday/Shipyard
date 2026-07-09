@@ -7,10 +7,23 @@
 #   - rust/cargo                    -> rustler NIFs (AstralOdyssey's isotope_118)
 # Pushed as sickday/elixir:ci (see .github/workflows/ci-images.yml).
 #
+# Also built per-Elixir-version for libraries that support a range rather than a
+# single pinned version (isotope_118 supports ~> 1.18):
+#   sickday/elixir:ci       -> Elixir 1.20.0 / OTP 29   (the game servers)
+#   sickday/elixir:ci-1.19  -> Elixir 1.19.5 / OTP 28
+#   sickday/elixir:ci-1.18  -> Elixir 1.18.4 / OTP 27
+#
+# The version-specific tags use hexpm/elixir rather than the official image
+# because `elixir:1.18.4-otp-27` is Debian bookworm, whose `nodejs` is 18 —
+# too old for `actions/checkout@v4`, which declares `using: node20`. Forgejo
+# does not inject a node binary into custom containers. The hexpm trixie
+# variants ship node 20.
+#
 # Pinned (not `:latest`): `:latest` floats to in-dev Elixir releases whose new
 # warnings break `mix compile --warnings-as-errors`. Bump deliberately and keep
 # in sync with each app's Dockerfile + local dev toolchain.
-FROM elixir:1.20.0-otp-29
+ARG BASE_IMAGE=elixir:1.20.0-otp-29
+FROM ${BASE_IMAGE}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -22,6 +35,8 @@ RUN apt-get update \
 
 # Rust toolchain, system-wide, for rustler-backed NIFs. World-readable so the
 # job container's user (root by default, but defensively any user) can use it.
+# rustup `stable` rather than Debian's `rustc`: rustler 0.38 requires rustc
+# >= 1.91 and distro packages lag well behind that.
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH
