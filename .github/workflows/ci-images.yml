@@ -6,7 +6,7 @@ name: Build the game-CI images (elixir:ci, kotlin, godot)
 #   sickday/elixir:ci-1.19    -> same, Elixir 1.19 / OTP 28  (isotope_118 matrix)
 #   sickday/elixir:ci-1.18    -> same, Elixir 1.18 / OTP 27  (isotope_118 matrix)
 #   sickday/kotlin:latest     -> JDK 21 + standalone kotlinc (both Kotlin clients)
-#   sickday/godot:mono-4.6.3  -> barichello godot-ci mono + node + awscli + zip
+#   sickday/godot:mono-4.7.2  -> barichello godot-ci mono + node + awscli + zip
 #                                (AstralOdyssey client: B2 asset fetch -> export)
 
 on:
@@ -36,7 +36,7 @@ jobs:
           - { path: "elixir/ci/", image: "elixir", tag: "ci-1.18", platforms: "linux/amd64,linux/arm64", build_args: "BASE_IMAGE=hexpm/elixir:1.18.4-erlang-27.3.4.14-debian-trixie-20260623" }
           - { path: "kotlin/", image: "kotlin", tag: "latest", platforms: "linux/amd64,linux/arm64", build_args: "" }
           # godot derives an amd64-only upstream base, so amd64 only.
-          - { path: "godot/", image: "godot", tag: "mono-4.6.3", platforms: "linux/amd64", build_args: "" }
+          - { path: "godot/", image: "godot", tag: "mono-4.7.2", platforms: "linux/amd64", build_args: "" }
     uses: ./.github/workflows/build_push.yml
     with:
       ref: ${{ github.ref }}
